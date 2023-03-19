@@ -1,3 +1,17 @@
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import *
+import datetime
+from datetime import timedelta, timedelta
+import numpy as np
+import re
+from time import sleep
+import pandas as pd
+
+from pyspark.context import SparkContext
+from pyspark.sql.session import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, DateType, TimestampType
+from pyspark.sql.functions import current_timestamp
+    
 def send_email_notification(mode,
                             pandas_email_df, 
                             email_body_template_html, 
@@ -44,21 +58,6 @@ def send_email_notification(mode,
                                                  mode is 'test'.
             do_not_cc_anyone (bool): Whether to cc anyone.
     """
-
-    
-    from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import *
-    import datetime
-    from datetime import timedelta, timedelta
-    import numpy as np
-    import re
-    from time import sleep
-    import pandas as pd
-    
-    from pyspark.context import SparkContext
-    from pyspark.sql.session import SparkSession
-    from pyspark.sql.types import StructType, StructField, StringType, DateType, TimestampType
-    from pyspark.sql.functions import current_timestamp
 
     spark = SparkSession \
         .builder \
