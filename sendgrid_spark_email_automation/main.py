@@ -153,11 +153,34 @@ def send_email_notification(mode,
                 print(e)
 
                 
+    def historical_notification_table_existence_check(historical_database_table):
+        if not spark.catalog.tableExists(f"{historical_database_table}"):
+            print(f'\nCreating {historical_database_table} in {spark.conf.get("spark.sql.catalogImplementation")} catalog')
+            # Define the schema
+            schema = StructType([
+                StructField('to_users', StringType(), True),
+                StructField('cc_users', StringType(), True),
+                StructField('notification_type', StringType(), True),
+                StructField('unique_id', StringType(), True),
+                StructField('datetime_sent', TimestampType(), True)
+            ])
+
+            # Create an empty DataFrame with the defined schema
+            empty_df = spark.createDataFrame([], schema)
+
+            # Save the empty DataFrame as a table
+            empty_df.write.saveAsTable(historical_database_table)
+            print('SUCCESSFULLY CREATED')
+            
+                
     def append_to_delta_table(data,historical_database_table):
         cols = ['to_users', 'cc_users', 'notification_type', 'unique_id']
         email_df = pd.DataFrame(columns=cols, data=data)
         df = spark.createDataFrame(email_df).withColumn('datetime_sent', current_timestamp())
-    
+        
+        # check to see if table exists or if we need to create it
+        historical_notification_table_existence_check(historical_database_table)
+        
         database_name,table_name = historical_database_table.split('.')[0],historical_database_table.split('.')[1]
         table_path = spark.sql(f"""describe detail {database_name}.{table_name}""").toPandas()['location'].values[0]
         
@@ -201,24 +224,8 @@ def send_email_notification(mode,
         assert 'cc_user_emails' in cols, f"Error: 'cc_user_emails' is not a column in `pandas_email_df`"
         assert 'unique_id' in cols, f"Error: 'unique_id' is not a column in `pandas_email_df`"
             
-        # Check if the historical_database_table exists
-        if not spark.catalog.tableExists(f"{historical_database_table}"):
-            print(f'\nCreating {historical_database_table} in {spark.conf.get("spark.sql.catalogImplementation")} catalog')
-            # Define the schema
-            schema = StructType([
-                StructField('to_users', StringType(), True),
-                StructField('cc_users', StringType(), True),
-                StructField('notification_type', StringType(), True),
-                StructField('unique_id', StringType(), True),
-                StructField('datetime_sent', TimestampType(), True)
-            ])
-
-            # Create an empty DataFrame with the defined schema
-            empty_df = spark.createDataFrame([], schema)
-
-            # Save the empty DataFrame as a table
-            empty_df.write.saveAsTable(historical_database_table)
-            print('SUCCESSFULLY CREATED')
+        # check to see if table exists or if we need to create it
+        historical_notification_table_existence_check(historical_database_table)
 
         # Load the historical table as a pandas DataFrame
         historical_pandas_table = spark.table(historical_database_table).toPandas()
