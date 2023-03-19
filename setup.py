@@ -6,7 +6,7 @@ setup(
     url='https://github.com/liam-clifford/sendgrid_spark_email_automation',
     author='Liam Clifford',
     author_email='liamclifford4@gmail.com',
-    description='This Python library provides a simple way to send emails using SendGrid's API and automates the process of logging email records in Spark.',
+    description="This Python library provides a simple way to send emails using SendGrid's API and automates the process of logging email records in Spark.",
     packages=find_packages(),
     install_requires=[
         'sendgrid==6.9.7',
