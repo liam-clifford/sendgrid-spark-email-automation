@@ -5,13 +5,13 @@ def send_email_notification(mode,
                             from_user_email, 
                             send_grid_key, 
                             notification_type,
-                            historical_data_list=[], 
                             historical_database_table,
-                            bcc_emails=None,
+                            historical_data_list=[], 
                             update_historical_notification_log=True,
                             number_of_test_records=1,
                             do_not_send_any_emails=False,
                             skip_if_email_sent=True,
+                            bcc_emails=None,
                             **kwargs):
     """
     
