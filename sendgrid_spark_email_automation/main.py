@@ -20,7 +20,6 @@ def send_email_notification(mode,
                             send_grid_key, 
                             notification_type,
                             historical_database_table,
-                            historical_data_list=[], 
                             update_historical_notification_log=True,
                             number_of_test_records=1,
                             do_not_send_any_emails=False,
@@ -41,12 +40,11 @@ def send_email_notification(mode,
         from_user_email (str): The email address from which the email will be sent.
         send_grid_key (str): SendGrid API key.
         notification_type (str): The type of notification.
-        historical_data_list (list): The list of dictionaries of historical email data.
-        bcc_emails (list): The list of email addresses to bcc the email.
         update_historical_notification_log (bool): Whether to update the historical notification log.
         historical_database_table (str): The name of the historical database table.
         number_of_test_records (int): The number of test records to send.
         do_not_send_any_emails (bool): Whether to send any emails.
+        bcc_emails (list): The list of email addresses to bcc the email.
         skip_if_email_sent (bool): Whether to skip sending the email if it has already been sent.
         
         **kwargs:
@@ -94,14 +92,14 @@ def send_email_notification(mode,
     def build_email_addresses(to_user_emails, kwargs):
         if kwargs is not None and 'only_send_to_test_emails' in kwargs:
             if isinstance(kwargs['only_send_to_test_emails'], list)==False:
-              raise ValueError('\n',f"`only_send_to_test_emails` needs to be a python list.",'\n')
+              raise ValueError('\n',f"`only_send_to_test_emails` needs to be a python list.")
                   
             to_user_emails = kwargs['only_send_to_test_emails']
-            print(f"{'Sending To: ':<{print_spacing}}{to_user_emails}",'\n')
+            print(f"\n{'Sending To: ':<{print_spacing}}{to_user_emails}")
             to_emails = [To(x) for x in to_user_emails]
         else:
             to_emails = [To(x) for x in str(to_user_emails).split(',')]
-            print(f"{'Sending To: ':<{print_spacing}}{[x for x in str(to_user_emails).split(',')]}")
+            print(f"\n{'Sending To: ':<{print_spacing}}{[x for x in str(to_user_emails).split(',')]}")
 
         return to_emails
 
@@ -114,12 +112,12 @@ def send_email_notification(mode,
                 if kwargs is not None and 'do_not_cc_anyone' in kwargs:
                     pass
                 else:
-                    print(f"""{"CC'ing:":<{print_spacing}}{[x for x in str(cc_user_emails).split(',')]}""")
+                    print(f"""\n{"CC'ing:":<{print_spacing}}{[x for x in str(cc_user_emails).split(',')]}""")
                     for a in np.arange(0,int(str(cc_user_emails).count(','))+1):
                         message.personalizations[0].add_cc(Email(str(cc_user_emails).split(',')[a]))
 
             if str(bcc_user_emails).find('@') != -1:
-                print(f"""{"BCC'ing:":<{print_spacing}}{[x for x in str(bcc_user_emails).split(',')]}""",'\n')
+                print(f"""\n{"BCC'ing:":<{print_spacing}}{[x for x in str(bcc_user_emails).split(',')]}""")
                 for a in np.arange(0,int(str(bcc_user_emails).count(','))+1):
                     message.personalizations[0].add_bcc(Email(str(bcc_user_emails).split(',')[a]))
 
@@ -249,7 +247,7 @@ def send_email_notification(mode,
     
     if skip_if_email_sent:
         assert historical_database_table, f"\nError: please provide a value for the 'historical_database_table' argument"
-        print(f'Exclude any rows where `unique_id` and `notification_type` ({notification_type}) combination exist in `{historical_database_table}`\n')
+        print(f'\nExclude any rows where `unique_id` and `notification_type` ({notification_type}) combination exist in `{historical_database_table}`')
         pandas_email_df = filter_pandas_dataframe(pandas_email_df, historical_database_table, notification_type)
                 
     email_dict, test_dict = create_dicts_from_df(pandas_email_df, number_of_test_records, notification_type)
@@ -274,8 +272,7 @@ def send_email_notification(mode,
     
     if mode == 'test':
 
-      print('\n')
-      print('--> setting `email_dict` == `test_dict`')
+      print('\n--> setting `email_dict` == `test_dict`')
       print(f"""`test_dict` contains {number_of_test_records} {'record' if number_of_test_records == 1 else 'records'} from `pandas_email_df`""")
       print('\n')
       
@@ -302,7 +299,7 @@ def send_email_notification(mode,
             
             if bcc_emails is not None:
                 if isinstance(bcc_emails, list)==False:
-                    raise ValueError('\n',f"`bcc_emails` needs to be a python list.",'\n')
+                    raise ValueError('\n',f"`bcc_emails` needs to be a python list.")
                   
                 bcc_users = [x for x in bcc_emails if x.find('@') != -1 and x not in to_user_emails.split(',')]
                 
@@ -329,16 +326,16 @@ def send_email_notification(mode,
             
             if do_not_send_any_emails==False:
                 send_email(message, send_grid_key)
-                print(f'{i+1}) email status: SUCCESS','\n')
+                print(f'\n{i+1}) email status: SUCCESS')
             else:
-                print(f'{i+1}) do_not_send_any_emails: `{do_not_send_any_emails}` -> do not send email\n')
+                print(f'\n{i+1}) do_not_send_any_emails: `{do_not_send_any_emails}` -> do not send email')
             
         if update_historical_notification_log:
             assert historical_database_table, f"Error: please provide a value for the 'historical_database_table' argument"
             append_to_delta_table(data=historical_data_list,historical_database_table=historical_database_table)
-            print(f"--> Added {len(historical_data_list)} {'record' if len(historical_data_list) == 1 else 'records'} to {historical_database_table}")
+            print(f"\n--> Added {len(historical_data_list)} {'record' if len(historical_data_list) == 1 else 'records'} to {historical_database_table}")
         else:
-            print(f"--> {'update_historical_notification_log: ':<{print_spacing}}{update_historical_notification_log}")
+            print(f"\n--> {'update_historical_notification_log: ':<{print_spacing}}{update_historical_notification_log}")
 
     else:
         print('\nNo data found in `email_dict` variable => No emails to send')
