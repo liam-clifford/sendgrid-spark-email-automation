@@ -70,7 +70,7 @@ def send_email_notification(mode,
     def build_email_body(email_dict, email_body_template_html, i, kwargs):
         if kwargs is not None and 'email_body_variables' in kwargs:
             email_body_variables_list = [email_dict['records'][i][x] for x in kwargs['email_body_variables']]
-            print(f"{'email_body_variables:':<{print_spacing}}{email_body_variables_list}")
+            print(f"\n{'email_body_variables:':<{print_spacing}}{email_body_variables_list}")
             email_html = email_body_template_html.format(*email_body_variables_list)
         else:
             email_html = email_body_template_html
@@ -83,7 +83,7 @@ def send_email_notification(mode,
             email_subject_variables = kwargs['email_subject_variables']
             print(f"{'email_subject_variables:':<{print_spacing}}{email_subject_variables}")
             emailSubject = email_subject.format(*email_subject_variables_list)
-            print(f"{'emailSubject:':<{print_spacing}}{emailSubject}")
+            print(f"{'email_subject:':<{print_spacing}}{emailSubject}")
         else:
             emailSubject = email_subject
             print(f"{'emailSubject:':<{print_spacing}}{emailSubject}")
