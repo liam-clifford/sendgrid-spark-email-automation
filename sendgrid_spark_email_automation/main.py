@@ -131,6 +131,7 @@ def send_email_notification(mode,
         if kwargs is not None and 'whitelisted_domain' in kwargs: 
             from_user_email = re.sub('@' + from_user_email.split('@')[1],kwargs['whitelisted_domain'],from_user_email)
             replyTo = re.sub(kwargs['whitelisted_domain'],'@' + from_user_email.split('@')[1],from_user_email)
+            message.reply_to = ReplyTo(replyTo,replyTo)
 
         message = Mail(
             from_email=from_user_email,
@@ -139,7 +140,6 @@ def send_email_notification(mode,
             html_content=email_html
         )
         
-        message.reply_to = ReplyTo(replyTo,replyTo)
 
         return message
 
