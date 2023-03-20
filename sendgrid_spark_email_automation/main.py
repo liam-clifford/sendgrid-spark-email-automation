@@ -55,6 +55,8 @@ def send_email_notification(mode,
             only_send_to_test_emails (list): A list of email addresses to which the email will be sent if 
                                                  mode is 'test'.
             do_not_cc_anyone (bool): Whether to cc anyone.
+            whitelisted_domain (str): domain in which you have configured your Sendgrid account to send on behalf of.
+            
     """
 
     spark = SparkSession \
@@ -125,7 +127,10 @@ def send_email_notification(mode,
     
     
     def build_message(from_user_email, to_user_emails, email_subject, email_html):
-        from_user_email = re.sub('@databricks.com','@m.databricks.com',from_user_email)
+        
+        if kwargs is not None and 'whitelisted_domain' in kwargs: 
+            from_user_email = re.sub('@' + from_user_email.split('@')[1],kwargs['whitelisted_domain'],from_user_email)
+            replyTo = re.sub(kwargs['whitelisted_domain'],'@' + from_user_email.split('@')[1],from_user_email)
 
         message = Mail(
             from_email=from_user_email,
@@ -133,8 +138,7 @@ def send_email_notification(mode,
             subject=email_subject,
             html_content=email_html
         )
-
-        replyTo = re.sub('m.databricks.com','databricks.com',from_user_email)
+        
         message.reply_to = ReplyTo(replyTo,replyTo)
 
         return message
