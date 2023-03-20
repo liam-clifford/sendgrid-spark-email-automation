@@ -55,7 +55,7 @@ def send_email_notification(mode,
             only_send_to_test_emails (list): A list of email addresses to which the email will be sent if 
                                                  mode is 'test'.
             do_not_cc_anyone (bool): Whether to cc anyone.
-            whitelisted_domain (str): domain in which you have configured your Sendgrid account to send on behalf of.
+            whitelisted_domain (str): ('@[insert your whitelisted domain here']) domain in which you have configured your Sendgrid account to send on behalf of.
             
     """
 
