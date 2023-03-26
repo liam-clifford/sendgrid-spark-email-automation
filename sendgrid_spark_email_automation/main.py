@@ -29,7 +29,6 @@ def send_email_notification(mode,
     """
     
     Automate the process of sending emails via SendGrid and logging the email records using Spark.
-
     Args:
         mode (str): The mode in which the function is running - 'test' or 'prod'.
         pandas_email_df (pandas.DataFrame): A Pandas DataFrame that contains the email recipients' details. It should 
@@ -133,7 +132,7 @@ def send_email_notification(mode,
             to_emails=to_user_emails,
             subject=email_subject,
             html_content=email_html
-        ) 
+        )
         
         if kwargs is not None and 'whitelisted_domain' in kwargs: 
             from_user_email = re.sub('@' + from_user_email.split('@')[1],kwargs['whitelisted_domain'],from_user_email)
@@ -159,8 +158,8 @@ def send_email_notification(mode,
             print(f'\nCreating {historical_database_table} in {spark.conf.get("spark.sql.catalogImplementation")} catalog')
             # Define the schema
             schema = StructType([
-                StructField('to_users', StringType(), True),
-                StructField('cc_users', StringType(), True),
+                StructField('to_user_emails', StringType(), True),
+                StructField('cc_user_emails', StringType(), True),
                 StructField('notification_type', StringType(), True),
                 StructField('unique_id', StringType(), True),
                 StructField('datetime_sent', TimestampType(), True)
@@ -175,7 +174,7 @@ def send_email_notification(mode,
             
                 
     def append_to_delta_table(data,historical_database_table):
-        cols = ['to_users', 'cc_users', 'notification_type', 'unique_id']
+        cols = ['to_user_emails', 'cc_user_emails', 'notification_type', 'unique_id']
         email_df = pd.DataFrame(columns=cols, data=data)
         df = spark.createDataFrame(email_df).withColumn('datetime_sent', current_timestamp())
         
@@ -217,30 +216,29 @@ def send_email_notification(mode,
 
         return loop_details_dict, test_dict
       
-      
     def filter_pandas_dataframe(pandas_email_df: pd.DataFrame, historical_database_table: str, notification_type: str) -> pd.DataFrame:
-
         cols = pandas_email_df.columns
         assert 'to_user_emails' in cols, f"Error: 'to_user_emails' is not a column in `pandas_email_df`"
         assert 'cc_user_emails' in cols, f"Error: 'cc_user_emails' is not a column in `pandas_email_df`"
         assert 'unique_id' in cols, f"Error: 'unique_id' is not a column in `pandas_email_df`"
-            
+
         # check to see if table exists or if we need to create it
         historical_notification_table_existence_check(historical_database_table)
 
         # Load the historical table as a pandas DataFrame
         historical_pandas_table = spark.table(historical_database_table).toPandas()
 
-        # Filter the historical pandas DataFrame based on the notification_type
-        filtered_historical_table = historical_pandas_table[historical_pandas_table['notification_type'] == notification_type]
-
-        # Get the distinct unique_id values from the filtered historical table
-        distinct_unique_ids = filtered_historical_table['unique_id'].unique()
-
-        # Filter the pandas_email_df based on the distinct_unique_ids
-        filtered_pandas_email_df = pandas_email_df[~pandas_email_df['unique_id'].isin(distinct_unique_ids)]
+        # Add notification_type as column
+        pandas_email_df['notification_type'] = notification_type
+        
+        # Filter the pandas_email_df based on the to_user_emails, unique_id, and notification_type columns
+        filtered_pandas_email_df = pandas_email_df[~pandas_email_df[['to_user_emails', 'unique_id', 'notification_type']].\
+                                   apply(lambda x: tuple(x),axis=1).\
+                                   isin(historical_pandas_table[['to_users', 'unique_id', 'notification_type']].\
+                                   apply(lambda x: tuple(x), axis=1))]
 
         return filtered_pandas_email_df
+
 
       
     historical_data_list = []
