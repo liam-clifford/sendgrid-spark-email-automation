@@ -19,11 +19,11 @@ def send_email_notification(mode,
                             from_user_email, 
                             send_grid_key, 
                             notification_type,
-                            historical_database_table,
                             update_historical_notification_log=False,
                             number_of_test_records=1,
                             do_not_send_any_emails=False,
                             skip_if_email_sent=False,
+                            historical_database_table=None,
                             bcc_emails=None,
                             **kwargs):
     """
