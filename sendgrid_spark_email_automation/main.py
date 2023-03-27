@@ -233,9 +233,9 @@ def send_email_notification(mode,
         
         # Filter the pandas_email_df based on the to_user_emails, unique_id, and notification_type columns
         filtered_pandas_email_df = pandas_email_df[~pandas_email_df[['to_user_emails', 'unique_id', 'notification_type']].\
-                                   apply(lambda x: tuple(x),axis=1).\
+                                   apply(lambda x: tuple(map(str, x)), axis=1).\
                                    isin(historical_pandas_table[['to_user_emails', 'unique_id', 'notification_type']].\
-                                   apply(lambda x: tuple(x), axis=1))]
+                                   apply(lambda x: tuple(map(str, x)), axis=1))]
 
         return filtered_pandas_email_df
 
