@@ -1,5 +1,5 @@
 # sendgrid-spark-email-automation
-`send_email_notification` is a wrapper function, built on top of the [SendGrid](https://github.com/sendgrid/sendgrid-python) Python library, that makes it easier to send custom email notifications via Sendgrid and record them through Spark. It provides various optional parameters that allow users to personalize the recipient list, subject line, and email body, as well as provide desired debugging attributes.
+`send_email_notification` is a wrapper function, built on top of the [SendGrid](https://github.com/sendgrid/sendgrid-python) Python library, that aims to make it easier to send custom email notifications via Sendgrid/record them in a Database through Spark. It also provides various optional parameters that allow users to personalize the recipient list, subject line, and email body.
 
 # Table of Contents
 - [Prerequisites](#prerequisites)
