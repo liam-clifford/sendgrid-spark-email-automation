@@ -53,8 +53,9 @@ def send_email_notification(mode,
                                                  in the email subject.
             only_send_to_test_emails (list): A list of email addresses to which the email will be sent if 
                                                  mode is 'test'.
+            reply_to_domain (str): If you have set up Domain Authentication for your SendGrid account, 
+                                   you must provide this argument to ensure that recipients can reply to the correct domain.
             do_not_cc_anyone (bool): Whether to cc anyone.
-            whitelisted_domain (str): ('@[insert your whitelisted domain here']) domain in which you have configured your Sendgrid account to send on behalf of.
             
     """
 
@@ -134,9 +135,8 @@ def send_email_notification(mode,
             html_content=email_html
         )
         
-        if kwargs is not None and 'whitelisted_domain' in kwargs: 
-            from_user_email = re.sub('@' + from_user_email.split('@')[1],kwargs['whitelisted_domain'],from_user_email)
-            replyTo = re.sub(kwargs['whitelisted_domain'],'@' + from_user_email.split('@')[1],from_user_email)
+        if kwargs is not None and 'reply_to_domain' in kwargs: 
+            replyTo = from_user_email.split('@')[0] + '@' + kwargs['reply_to_domain']
             message.reply_to = ReplyTo(replyTo,replyTo)
 
         return message
