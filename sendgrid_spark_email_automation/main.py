@@ -17,7 +17,7 @@ def send_email_notification(mode,
                             email_body_template_html, 
                             email_subject, 
                             from_user_email, 
-                            send_grid_key, 
+                            sendgrid_key, 
                             notification_type,
                             update_historical_notification_log=False,
                             number_of_test_records=1,
@@ -37,7 +37,7 @@ def send_email_notification(mode,
         email_body_template_html (str): The HTML string template for the email body.
         email_subject (str): The email subject.
         from_user_email (str): The email address from which the email will be sent.
-        send_grid_key (str): SendGrid API key.
+        sendgrid_key (str): SendGrid API key.
         notification_type (str): The type of notification.
         update_historical_notification_log (bool): Whether to update the historical notification log.
         historical_database_table (str): The name of the historical database table.
@@ -326,7 +326,7 @@ def send_email_notification(mode,
             message = add_additional_recipients(cc_user_emails, bcc_user_emails, message, kwargs)
             
             if do_not_send_any_emails==False:
-                send_email(message, send_grid_key)
+                send_email(message, sendgrid_key)
                 print(f'\n{i+1}) email status: SUCCESS')
             else:
                 print(f'\n{i+1}) do_not_send_any_emails: `{do_not_send_any_emails}` -> do not send email')
