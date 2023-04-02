@@ -281,7 +281,7 @@ send_email_notification(mode='test',
                         from_user_email='YOUR_AUTHENTICATED_EMAIL_ADDRESS_GOES_HERE',
                         sendgrid_key=sendgrid_key,
                         notification_type='hello world',
-                        **do_not_send_any_emails**=True)
+                        do_not_send_any_emails=True)
 ```
 
 - Setting `do_not_send_any_emails` = True will prevent any emails from being sent.
