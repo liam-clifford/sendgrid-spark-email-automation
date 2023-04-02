@@ -204,7 +204,7 @@ send_email_notification(mode='test',
 
 email_body_template_html = "Hello World!<br>My first name is {0}.<br>My last name is {1}.<br><br>This is a test email."
 
-email_subject = "Test Email - {2} (color)"
+email_subject = "Test Email - {0} (color)"
 
 sendgrid_key = 'insert_your_sendgrid_key_here'
 
@@ -297,7 +297,7 @@ send_email_notification(mode='test',
 
 email_body_template_html = "Hello World!<br>My first name is {0}.<br>My last name is {1}.<br><br>This is a test email."
 
-email_subject = "Test Email - {2} (color)"
+email_subject = "Test Email - {0} (color)"
 
 sendgrid_key = 'insert_your_sendgrid_key_here'
 
