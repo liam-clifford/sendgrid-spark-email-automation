@@ -122,8 +122,7 @@ send_email_notification(mode='prod',
                         email_subject=email_subject, 
                         email_body_template_html=email_body_template_html,
                         from_user_email='YOUR_AUTHENTICATED_EMAIL_ADDRESS_GOES_HERE',
-                        sendgrid_key=sendgrid_key,
-                        notification_type='hello world')
+                        sendgrid_key=sendgrid_key)
 ```
 
 - This code above would send an email to the email address specified in `to_user_emails`.
