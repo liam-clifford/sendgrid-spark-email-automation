@@ -244,7 +244,8 @@ def send_email_notification(mode,
     historical_data_list = []
     # always set `historical_data_list` to empty
     
-    assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
+    if (update_historical_notification_log or skip_if_email_sent or historical_database_table!=None) and notification_type==None:
+        assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
     
     if skip_if_email_sent:
         assert historical_database_table, f"\nError: please provide a value for the 'historical_database_table' argument"
