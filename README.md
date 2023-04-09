@@ -2,6 +2,7 @@
 `send_email_notification` is a wrapper function, built on top of the [SendGrid](https://github.com/sendgrid/sendgrid-python) Python library, that aims to make it easier to send custom email notifications via Sendgrid/record them in a Database through Spark. It also provides various optional parameters that allow users to personalize the recipient list, subject line, and email body.
 
 # Table of Contents
+- [Shameless Plug](#shameless-plug)
 - [Prerequisites](#prerequisites)
 - [Dependencies](#dependencies)
 - [Setup](#setup)
@@ -22,6 +23,9 @@
   - [Do not send any email notifications](#do-not-send-any-email-notifications)
   - [How I currently use it](#how-i-currently-use-it)
 
+# Shameless Plug
+- Related Medium Post
+  - Here's a [link](https://medium.com/@liam_clifford/Sparking-the-Grid-Ignite-Your-Email-Notifications-with-SendGrid-and-Spark-4a921c8f3570) to a (hopefully) less technical version of this! 
 
 # Prerequisites
 1. A SendGrid account (see setup section)
@@ -47,6 +51,9 @@
 6. You'll be taken to a screen where you can view your newly created API key. 
   - Be sure to copy it down somewhere safe, as you won't be able to view it again
     - This key is required - as this is what you will be using for the `sendgrid_key` argument. 
+      - **Friendly Reminder**: avoid security concerns by `not` hard coding your API keys!
+        - *If you use Databricks, then you can use [Secrets](https://docs.databricks.com/security/secrets/secrets.html)*
+        - *If you use Azure Data Factory, then you can use [Key Vault](https://azure.microsoft.com/en-us/products/key-vault)*
 
 
 ### Sender Verification
