@@ -365,7 +365,7 @@ send_email_notification(mode='prod',
 - `email_subject`: The email subject.
 - `from_user_email`: The email address from which the email will be sent.
 - `sendgrid_key`: SendGrid API key.
-- `notification_type`: The type of notification.
+- `notification_type`: A name (string) to describe the type of notification (Default: `None`).
 - `update_historical_notification_log`: Whether to update the historical notification log (Default: `False`).
 - `historical_database_table`: The name of the historical database table (Default: `None`).
 - `number_of_test_records`: The number of test records to send (Default: `1`).
