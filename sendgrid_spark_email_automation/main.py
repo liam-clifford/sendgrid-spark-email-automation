@@ -18,7 +18,7 @@ def send_email_notification(mode,
                             email_subject, 
                             from_user_email, 
                             sendgrid_key, 
-                            notification_type=None,
+                            notification_type,
                             update_historical_notification_log=False,
                             number_of_test_records=1,
                             do_not_send_any_emails=False,
@@ -77,15 +77,16 @@ def send_email_notification(mode,
         return email_html, email_body_template_html
       
       
-    def build_email_subject(email_dict, email_subject, i, kwargs):
+    def build_email_subject(email_dict, email_subject_str, i, kwargs):
         if kwargs is not None and 'email_subject_variables' in kwargs:
             email_subject_variables_list = [email_dict['records'][i][x] for x in kwargs['email_subject_variables']]
+
             email_subject_variables = kwargs['email_subject_variables']
             print(f"{'email_subject_variables:':<{print_spacing}}{email_subject_variables}")
-            emailSubject = email_subject.format(*email_subject_variables_list)
+            emailSubject = email_subject_str.format(*email_subject_variables_list)
             print(f"{'email_subject:':<{print_spacing}}{emailSubject}")
         else:
-            emailSubject = email_subject
+            emailSubject = email_subject_str
             print(f"{'emailSubject:':<{print_spacing}}{emailSubject}")
 
         return emailSubject
@@ -126,12 +127,12 @@ def send_email_notification(mode,
         return message
     
     
-    def build_message(from_user_email, to_user_emails, email_subject, email_html):
+    def build_message(from_user_email, to_user_emails, email_subject_str_final, email_html):
 
         message = Mail(
             from_email=from_user_email,
             to_emails=to_user_emails,
-            subject=email_subject,
+            subject=email_subject_str,
             html_content=email_html
         )
         
@@ -155,7 +156,7 @@ def send_email_notification(mode,
                 
     def historical_notification_table_existence_check(historical_database_table):
         if not spark.catalog.tableExists(f"{historical_database_table}"):
-            print(f'\nCreating {historical_database_table} in {spark.conf.get("spark.sql.catalogImplementation")} catalog')
+            print(f'\nCreating {historical_database_table}')
             # Define the schema
             schema = StructType([
                 StructField('to_user_emails', StringType(), True),
@@ -181,13 +182,26 @@ def send_email_notification(mode,
         # check to see if table exists or if we need to create it
         historical_notification_table_existence_check(historical_database_table)
         
-        database_name,table_name = historical_database_table.split('.')[0],historical_database_table.split('.')[1]
-        table_path = spark.sql(f"""describe detail {database_name}.{table_name}""").toPandas()['location'].values[0]
+        
+        uc_enabled = is_unity_catalog_enabled()
+
+        if uc_enabled:
+            database_name = historical_database_table.split('.')[0] + '.' + historical_database_table.split('.')[1]
+            table_name    = historical_database_table.split('.')[2]
+            table_path    = historical_database_table
+        else:
+            database_name,table_name = historical_database_table.split('.')[0],historical_database_table.split('.')[1]
+            table_path = spark.sql(f"""describe detail {database_name}.{table_name}""").toPandas()['location'].values[0]
+        
         
         while True:
             try:
-                df.write.format("delta").mode("append").save(f"{table_path}")
-                break  # Break out of the while loop if append succeeds
+                if uc_enabled:
+                    df.write.format("delta").mode("append").insertInto(historical_database_table)
+                    break  # Break out of the while loop if append succeeds
+                else:
+                    df.write.format("delta").mode("append").save(f"{table_path}")
+                    break  # Break out of the while loop if append succeeds
             except Exception as e:
                 print(f"Append to Delta table failed with error: {e}")
                 sleep(10)  # Wait for 10 seconds before retrying the append operation
@@ -244,8 +258,7 @@ def send_email_notification(mode,
     historical_data_list = []
     # always set `historical_data_list` to empty
     
-    if (update_historical_notification_log or skip_if_email_sent or historical_database_table!=None) and notification_type==None:
-        assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
+    assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
     
     if skip_if_email_sent:
         assert historical_database_table, f"\nError: please provide a value for the 'historical_database_table' argument"
@@ -281,6 +294,8 @@ def send_email_notification(mode,
       email_dict = test_dict
     
     num_emails = len(email_dict.get('records', []))
+    
+    email_subject_str = email_subject
 
     if num_emails > 0: 
         for i in range(0,num_emails):
@@ -321,9 +336,9 @@ def send_email_notification(mode,
                                         unique_id])
 
             email_html, email_body_template_html = build_email_body(email_dict, email_body_template_html, i, kwargs)
-            email_subject = build_email_subject(email_dict, email_subject, i, kwargs)
+            email_subject_str_final = build_email_subject(email_dict, email_subject_str, i, kwargs)
             to_user_emails = build_email_addresses(to_user_emails, kwargs)
-            message = build_message(from_user_email, to_user_emails, email_subject, email_html)
+            message = build_message(from_user_email, to_user_emails, email_subject_str_final, email_html)
             message = add_additional_recipients(cc_user_emails, bcc_user_emails, message, kwargs)
             
             if do_not_send_any_emails==False:
