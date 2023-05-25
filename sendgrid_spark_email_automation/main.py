@@ -132,7 +132,7 @@ def send_email_notification(mode,
         message = Mail(
             from_email=from_user_email,
             to_emails=to_user_emails,
-            subject=email_subject_str,
+            subject=email_subject_str_final,
             html_content=email_html
         )
         
