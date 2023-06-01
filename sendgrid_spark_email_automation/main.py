@@ -312,7 +312,7 @@ def send_email_notification(mode,
             if len(cc_users)>0:
                 cc_user_emails = ','.join(cc_users)
             else:
-                cc_user_emails = None
+                cc_user_emails = ''
             
             if bcc_emails is not None:
                 if isinstance(bcc_emails, list)==False:
