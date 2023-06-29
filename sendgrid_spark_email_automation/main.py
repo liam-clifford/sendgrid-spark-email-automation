@@ -249,7 +249,8 @@ def send_email_notification(mode,
         filtered_pandas_email_df = pandas_email_df[~pandas_email_df[['to_user_emails', 'unique_id', 'notification_type']].\
                                    apply(lambda x: tuple(map(str, x)), axis=1).\
                                    isin(historical_pandas_table[['to_user_emails', 'unique_id', 'notification_type']].\
-                                   apply(lambda x: tuple(map(str, x)), axis=1))]
+                                   apply(lambda x: tuple(map(str, x)), axis=1))].\
+                                   reset_index(drop=True)
 
         return filtered_pandas_email_df
 
