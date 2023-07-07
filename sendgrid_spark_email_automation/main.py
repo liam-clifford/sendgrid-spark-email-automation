@@ -155,7 +155,7 @@ def send_email_notification(mode,
 
                 
     def historical_notification_table_existence_check(historical_database_table):
-        if not spark.catalog.tableExists(f"{historical_database_table}"):
+        if not spark.sql(f"select * from {historical_database_table}").count() > 0:
             print(f'\nCreating {historical_database_table}')
             # Define the schema
             schema = StructType([
