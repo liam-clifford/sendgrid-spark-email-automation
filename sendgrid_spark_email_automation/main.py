@@ -319,6 +319,9 @@ def send_email_notification(mode,
 
             if 'bcc_user_emails' in email_dict['records'][i]:
                 bcc_user_capture_list = [x for x in str(email_dict['records'][i]['bcc_user_emails']).split(',') if x.find('@')!=-1 and x not in to_user_emails.split(',')]
+                
+            if len(bcc_user_capture_list)>0 and bcc_emails == None:
+                bcc_emails = []
             
             if bcc_emails is not None:
                 if isinstance(bcc_emails, list)==False:
@@ -328,7 +331,7 @@ def send_email_notification(mode,
                 bcc_users = bcc_users + bcc_user_capture_list
                 
                 if len(bcc_users)>0:
-                    bcc_user_emails = ','.join([x for x in bcc_emails if x.find('@') != -1 and x not in to_user_emails.split(',')])
+                    bcc_user_emails = ','.join([x for x in bcc_users if x.find('@') != -1 and x not in to_user_emails.split(',')])
                 else:
                     bcc_user_emails = None
             else:
