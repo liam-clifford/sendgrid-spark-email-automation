@@ -314,12 +314,18 @@ def send_email_notification(mode,
                 cc_user_emails = ','.join(cc_users)
             else:
                 cc_user_emails = ''
+                
+            bcc_user_capture_list = []
+
+            if 'bcc_user_emails' in email_dict['records'][i]:
+                bcc_user_capture_list = [x for x in str(email_dict['records'][i]['bcc_user_emails']).split(',') if x.find('@')!=-1 and x not in to_user_emails.split(',')]
             
             if bcc_emails is not None:
                 if isinstance(bcc_emails, list)==False:
                     raise ValueError('\n',f"`bcc_emails` needs to be a python list.")
                   
                 bcc_users = [x for x in bcc_emails if x.find('@') != -1 and x not in to_user_emails.split(',')]
+                bcc_users = bcc_users + bcc_user_capture_list
                 
                 if len(bcc_users)>0:
                     bcc_user_emails = ','.join([x for x in bcc_emails if x.find('@') != -1 and x not in to_user_emails.split(',')])
