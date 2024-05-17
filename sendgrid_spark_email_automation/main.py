@@ -243,7 +243,8 @@ def send_email_notification(mode,
         historical_pandas_table = spark.table(historical_database_table).toPandas()
 
         # Add notification_type as column
-        pandas_email_df['notification_type'] = notification_type
+        if notification_type:
+            pandas_email_df['notification_type'] = notification_type
         
         # Filter the pandas_email_df based on the to_user_emails, unique_id, and notification_type columns
         filtered_pandas_email_df = pandas_email_df[~pandas_email_df[['to_user_emails', 'unique_id', 'notification_type']].\
@@ -258,8 +259,11 @@ def send_email_notification(mode,
       
     historical_data_list = []
     # always set `historical_data_list` to empty
-    
-    assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
+        
+    if notification_type != 'override' and notification_type == None:
+        assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
+    if notification_type != 'override':
+        notification_type = None
     
     if skip_if_email_sent:
         assert historical_database_table, f"\nError: please provide a value for the 'historical_database_table' argument"
