@@ -214,8 +214,7 @@ def send_email_notification(mode,
         for i, row in final_pandas_df.iterrows():
             row_dict = row.to_dict()
             
-            if notification_type:
-              row_dict['notification_type'] = notification_type
+            row_dict['notification_type'] = notification_type
               
             loop_details_dict['records'][i] = row_dict
 
@@ -260,10 +259,7 @@ def send_email_notification(mode,
     historical_data_list = []
     # always set `historical_data_list` to empty
         
-    if notification_type != 'override' and notification_type == None:
-        assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
-    if notification_type == 'override':
-        notification_type = None
+    assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
     
     if skip_if_email_sent:
         assert historical_database_table, f"\nError: please provide a value for the 'historical_database_table' argument"
