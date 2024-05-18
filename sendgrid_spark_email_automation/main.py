@@ -262,7 +262,7 @@ def send_email_notification(mode,
         
     if notification_type != 'override' and notification_type == None:
         assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
-    if notification_type != 'override':
+    if notification_type == 'override':
         notification_type = None
     
     if skip_if_email_sent:
