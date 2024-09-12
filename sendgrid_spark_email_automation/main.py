@@ -211,14 +211,15 @@ def send_email_notification(mode,
                 sleep(10)  # Wait for 10 seconds before retrying the append operation
 
                 
-    def create_dicts_from_df(pandas_email_df, number_of_test_records, notification_type=None):
+    def create_dicts_from_df(pandas_email_df, number_of_test_records, notification_type):
         loop_details_dict = {'records': {}}
         final_pandas_df = pd.DataFrame(pandas_email_df, columns=pandas_email_df.columns)
 
         for i, row in final_pandas_df.iterrows():
             row_dict = row.to_dict()
-            
-            row_dict['notification_type'] = notification_type
+
+            if notification_type:
+                row_dict['notification_type'] = notification_type
               
             loop_details_dict['records'][i] = row_dict
 
@@ -263,7 +264,7 @@ def send_email_notification(mode,
     historical_data_list = []
     # always set `historical_data_list` to empty
         
-    assert notification_type, f"\nError: please provide a value for the 'notification_type' argument"
+    assert notification_type or notification_type in pandas_email_df.columns, f"\nError: please provide a value for the 'notification_type' argument"
     
     if skip_if_email_sent:
         assert historical_database_table, f"\nError: please provide a value for the 'historical_database_table' argument"
