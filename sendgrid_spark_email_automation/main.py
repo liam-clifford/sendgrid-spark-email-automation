@@ -25,6 +25,7 @@ def send_email_notification(mode,
                             skip_if_email_sent=False,
                             historical_database_table=None,
                             bcc_emails=None,
+                            pdf_attachment=None,
                             **kwargs):
     """
     
@@ -127,7 +128,7 @@ def send_email_notification(mode,
         return message
     
     
-    def build_message(from_user_email, to_user_emails, email_subject_str_final, email_html):
+    def build_message(from_user_email, to_user_emails, email_subject_str_final, email_html, pdf_attachment=None):
 
         message = Mail(
             from_email=from_user_email,
@@ -135,6 +136,9 @@ def send_email_notification(mode,
             subject=email_subject_str_final,
             html_content=email_html
         )
+        if pdf_attachment:
+            message.add_attachment(pdf_attachment)
+            print('PDF Attached')
         
         if kwargs is not None and 'reply_to_domain' in kwargs: 
             replyTo = from_user_email.split('@')[0] + '@' + kwargs['reply_to_domain']
@@ -344,11 +348,14 @@ def send_email_notification(mode,
                                         cc_user_emails,\
                                         notification_type,\
                                         unique_id])
+            
+            if 'pdf_attachment_data' in pandas_email_df.columns:
+                pdf_attachment = email_dict['records'][i]['pdf_attachment_data']
 
             email_html, email_body_template_html = build_email_body(email_dict, email_body_template_html, i, kwargs)
             email_subject_str_final = build_email_subject(email_dict, email_subject_str, i, kwargs)
             to_user_emails = build_email_addresses(to_user_emails, kwargs)
-            message = build_message(from_user_email, to_user_emails, email_subject_str_final, email_html)
+            message = build_message(from_user_email, to_user_emails, email_subject_str_final, email_html, pdf_attachment)
             message = add_additional_recipients(cc_user_emails, bcc_user_emails, message, kwargs)
             
             if do_not_send_any_emails==False:
